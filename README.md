@@ -1,38 +1,66 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# Pagamentos
 
-First, run the development server:
+Este projeto consiste em um sistema de checkout para uma loja virtual.
+
+
+## Stack utilizada
+
+**Front-end:** React, NextJs, Chakra-Ui
+
+
+## Documentação de cores
+
+| Cor               | Hexadecimal                                                |
+| ----------------- | ---------------------------------------------------------------- |
+| gray.50      | ![#F7FAFC](https://via.placeholder.com/10/F7FAFC?text=+) #F7FAFC |
+| gray.200       | ![#E2E8F0](https://via.placeholder.com/10/E2E8F0?text=+) #E2E8F0 |
+| gray.500     | ![#718096](https://via.placeholder.com/10/718096?text=+) #718096 |
+| gray.600      | ![#4A5568](https://via.placeholder.com/10/4A5568?text=+) #4A5568 |
+| gray.800      | ![#1A202C](https://via.placeholder.com/10/1A202C?text=+) #1A202C |
+| gray.900      | ![#171923](https://via.placeholder.com/10/171923?text=+) #171923 |
+
+
+## Como executar
+
+Antes de executar a aplicação, é necessário ter o Node.js instalado em sua máquina. Em seguida, execute os seguintes comandos na raiz do projeto para instalar as dependências:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+  npm install
+  # ou
+  yarn install
 ```
+Em seguida, execute o seguinte comando para iniciar a aplicação:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+  npm run dev
+  # ou
+  yarn dev
+```
+Isso iniciará o servidor de desenvolvimento do Next.js. Acesse http://localhost:3000 para visualizar a aplicação.
+## Como fazer o build
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Para gerar uma versão otimizada da aplicação para produção, execute o seguinte comando:
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+```bash
+  npm run build
+  # ou
+  yarn build
+```
+Isso irá gerar uma pasta build na raiz do projeto com os arquivos otimizados para produção.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Contribuindo
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Contribuições são sempre bem-vindas!
 
-## Learn More
+Se você deseja contribuir com o desenvolvimento deste projeto, sinta-se livre para fazer um fork deste repositório e enviar pull requests com suas modificações.
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Licença
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Este projeto é licenciado sob a licença MIT. Consulte o arquivo [LICENSE](https://github.com/david-franca/checkout/blob/main/LICENSE) para obter mais informações.
 
-## Deploy on Vercel
+## Autor
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [@david-franca](https://www.github.com/david-franca)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
