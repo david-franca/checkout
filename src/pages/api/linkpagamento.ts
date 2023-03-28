@@ -10,7 +10,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     const data: FinishPayment = req.body;
     api
-      .post("linkpagamento", data, {
+      .post("linkpagamento/payment", data, {
         params: { hash_id: data.hash_id },
       })
       .then((value) => {
