@@ -77,7 +77,7 @@ export const Summary = ({ data }: SummaryProps) => {
               </Text>
 
               <Text color="gray.50" fontSize="md">
-                {formatCurrency(item.valor_item)}
+                {formatCurrency(item.valor_item / 100)}
               </Text>
             </HStack>
             <HStack direction="row" justifyContent="space-between">
@@ -86,7 +86,7 @@ export const Summary = ({ data }: SummaryProps) => {
               </Text>
 
               <Text color="gray.50" fontSize="md">
-                {formatCurrency(item.valor_total_item)}
+                {formatCurrency(item.valor_total_item / 100)}
               </Text>
             </HStack>
           </Box>
@@ -99,7 +99,7 @@ export const Summary = ({ data }: SummaryProps) => {
         </Text>
         <Spacer />
         <Text as="b" color="gray.50" fontSize="2xl">
-          {formatCurrency(data.total)}
+          {formatCurrency(data.total / 100)}
         </Text>
       </HStack>
     </Box>
