@@ -130,6 +130,7 @@ export const CreditCard = ({ data, id }: CreditCardProps) => {
           setLoading(false);
           if (res.status === 200) {
             setSuccess(true);
+            formik.resetForm();
           }
         })
         .catch(() => {
