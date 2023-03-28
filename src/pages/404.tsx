@@ -1,5 +1,4 @@
-import { Box, Button, Center, Heading, Text } from "@chakra-ui/react";
-import Image from "next/image";
+import { Box, Center, Heading, Text } from "@chakra-ui/react";
 
 export default function NotFound() {
   return (
@@ -20,7 +19,6 @@ export default function NotFound() {
         <Text color={"gray.300"} mb={6}>
           A página que você está procurando não existe.
         </Text>
-        <Image src="back_home.svg" width={300} height={300} alt="Warning" />
       </Box>
     </Center>
   );

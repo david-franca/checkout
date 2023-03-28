@@ -36,11 +36,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { params } = ctx;
   const id = params?.id as string;
 
-  const res = await api.get<ClientData>("linkpagamento", {
+  const res = await api.get<ClientData | string>("linkpagamento", {
     params: {
       hash_id: id,
     },
   });
+
+  if (typeof res.data === "string") {
+    return {
+      notFound: true,
+    };
+  }
+
   const data = res.data;
   data.status = "pendente";
 

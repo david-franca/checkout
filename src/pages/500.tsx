@@ -1,5 +1,4 @@
 import { Center, Heading, Text } from "@chakra-ui/react";
-import Image from "next/image";
 
 export default function Error() {
   return (
@@ -12,7 +11,6 @@ export default function Error() {
           Por favor verifique o link ou tente novamente mais tarde.
         </Text>
       </Center>
-      <Image src="warning.svg" width={300} height={300} alt="Warning" />
     </Center>
   );
 }

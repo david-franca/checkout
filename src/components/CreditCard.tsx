@@ -1,16 +1,16 @@
 import "react-credit-cards-2/es/styles-compiled.css";
 
+import { nextApi } from "@/config/nextApi";
 import {
   getCreditCardNameByNumber,
+  initializeClearSale,
   isExpirationDateValid,
   isValid,
+  setApp,
+  setSessionId,
 } from "@/helpers";
-import { parseLocaleNumber } from "@/helpers/parseLocaleNumber";
 import {
-  Antifraude,
-  CardType,
   ClientData,
-  FormatedClientData,
   OnFinishValues,
   PaymentFormState,
 } from "@/models/checkout.models";
@@ -27,20 +27,16 @@ import {
   Select,
   SimpleGrid,
   Stack,
+  useToast,
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import { useEffect, useMemo, useState } from "react";
 import Cards from "react-credit-cards-2";
 import InputMask from "react-input-mask";
+import { v4 } from "uuid";
 import * as yup from "yup";
 import { ptForm } from "yup-locale-pt";
-import {
-  initializeClearSale,
-  setApp,
-  setSessionId,
-} from "../helpers/clearSale";
-import { v4 } from "uuid";
-import { api } from "@/config/api";
+
 import { Result } from "./Result";
 
 yup.setLocale(ptForm);
@@ -58,6 +54,7 @@ type InitialValues = Omit<PaymentFormState, "focus"> & {
 export const CreditCard = ({ data, id }: CreditCardProps) => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
   const installments = useMemo(
     () => Array.from(Array(data.parcelas).keys()).map((value) => value + 1),
     [data]
@@ -127,22 +124,23 @@ export const CreditCard = ({ data, id }: CreditCardProps) => {
         merchantOrderId: data.merchantOrderId,
         name: data.name,
       };
-      alert(JSON.stringify(paymentInfo, null, 2));
-      api
-        .post("linkpagamento", paymentInfo, {
-          params: {
-            hash_id: id,
-          },
-        })
+      nextApi
+        .post("linkpagamento", { ...paymentInfo, hash_id: id })
         .then((res) => {
           setLoading(false);
           if (res.status === 200) {
             setSuccess(true);
           }
         })
-        .catch((e) => {
+        .catch(() => {
           setLoading(false);
-          console.log(e);
+          toast({
+            title: "Erro",
+            description: "Pagamento recusado.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
         });
     },
   });
@@ -209,7 +207,7 @@ export const CreditCard = ({ data, id }: CreditCardProps) => {
         <Result
           status="success"
           title="Sucesso"
-          content="Pagamento aprovado."
+          content="Dados enviados para análise. Por favor aguarde mais informações."
         />
       ) : (
         <chakra.form

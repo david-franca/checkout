@@ -77,31 +77,6 @@ export interface ClientData {
   status: Status;
 }
 
-export interface FormatedItem {
-  amount: number;
-  valor_item: string;
-  name: string;
-  valor_total_item: string;
-}
-
-export interface FormatedClientData {
-  merchantOrderId: string;
-  total: number;
-  adquirente: string;
-  parcelas: number;
-  email: string;
-  name: string;
-  itens: FormatedItem[];
-  type?: CardType;
-  ci_merchant?: 1;
-  numeroCartao?: string;
-  nomeNoCartao?: string;
-  dataExpiracao?: string;
-  cvv?: string;
-  bandeira?: string;
-  antifraude?: Antifraude;
-}
-
 export type OnFinishValues = Omit<ClientData, "status"> & {
   type: CardType;
   ci_merchant: number;
