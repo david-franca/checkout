@@ -46,6 +46,11 @@ interface CreditCardProps {
   id: string;
 }
 
+interface Response {
+  statusCode: number;
+  body: string;
+}
+
 type InitialValues = Omit<PaymentFormState, "focus"> & {
   installments: number;
   sessionId: string;
@@ -125,7 +130,7 @@ export const CreditCard = ({ data, id }: CreditCardProps) => {
         name: data.name,
       };
       nextApi
-        .post("linkpagamento", { ...paymentInfo, hash_id: id })
+        .post<Response>("linkpagamento", { ...paymentInfo, hash_id: id })
         .then((res) => {
           setLoading(false);
           if (res.status === 200) {
