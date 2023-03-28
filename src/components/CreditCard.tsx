@@ -7,8 +7,11 @@ import {
 } from "@/helpers";
 import { parseLocaleNumber } from "@/helpers/parseLocaleNumber";
 import {
+  Antifraude,
   CardType,
+  ClientData,
   FormatedClientData,
+  OnFinishValues,
   PaymentFormState,
 } from "@/models/checkout.models";
 import {
@@ -23,6 +26,7 @@ import {
   Input,
   Select,
   SimpleGrid,
+  Stack,
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import { useEffect, useMemo, useState } from "react";
@@ -36,23 +40,14 @@ import {
   setSessionId,
 } from "../helpers/clearSale";
 import { v4 } from "uuid";
+import { api } from "@/config/api";
+import { Result } from "./Result";
 
 yup.setLocale(ptForm);
 
 interface CreditCardProps {
-  data: FormatedClientData;
-}
-
-interface OnFinishValues {
-  total: number; // Em centavos
-  type: CardType;
-  parcelas: number;
-  numeroCartao: string;
-  nomeNoCartao: string;
-  dataExpiracao: string;
-  cvv: string;
-  bandeira: string;
-  SessionID: string;
+  data: ClientData;
+  id: string;
 }
 
 type InitialValues = Omit<PaymentFormState, "focus"> & {
@@ -60,7 +55,9 @@ type InitialValues = Omit<PaymentFormState, "focus"> & {
   sessionId: string;
 };
 
-export const CreditCard = ({ data }: CreditCardProps) => {
+export const CreditCard = ({ data, id }: CreditCardProps) => {
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
   const installments = useMemo(
     () => Array.from(Array(data.parcelas).keys()).map((value) => value + 1),
     [data]
@@ -112,6 +109,7 @@ export const CreditCard = ({ data }: CreditCardProps) => {
     initialValues,
     validationSchema,
     onSubmit: (values) => {
+      setLoading(true);
       const paymentInfo: OnFinishValues = {
         cvv: values.cvc,
         numeroCartao: values.number,
@@ -119,11 +117,33 @@ export const CreditCard = ({ data }: CreditCardProps) => {
         nomeNoCartao: values.name,
         dataExpiracao: values.expiry,
         total: data.total * 100,
+        SessionId: uuid,
         type: "CreditCard",
         bandeira: getCreditCardNameByNumber(values.number),
-        SessionID: uuid,
+        adquirente: data.adquirente,
+        ci_merchant: data.ci_merchant,
+        antifraude: data.antifraude,
+        email: data.email,
+        merchantOrderId: data.merchantOrderId,
+        name: data.name,
       };
       alert(JSON.stringify(paymentInfo, null, 2));
+      api
+        .post("linkpagamento", paymentInfo, {
+          params: {
+            hash_id: id,
+          },
+        })
+        .then((res) => {
+          setLoading(false);
+          if (res.status === 200) {
+            setSuccess(true);
+          }
+        })
+        .catch((e) => {
+          setLoading(false);
+          console.log(e);
+        });
     },
   });
 
@@ -152,142 +172,180 @@ export const CreditCard = ({ data }: CreditCardProps) => {
   }, [uuid]);
 
   return (
-    <Box w="full" p={16} bg="gray.800">
-      <Heading as="h3" size="lg" color="gray.50" pb={8}>
-        Dados do Pagamento
-      </Heading>
-      <Box pb={8}>
-        <Cards
-          cvc={state.cvc}
-          expiry={state.expiry}
-          focused={state.focus}
-          name={state.name}
-          number={state.number}
-          placeholders={{ name: "Seu nome aqui" }}
-        />
-      </Box>
+    <Box w="full" p={{ base: 4, md: 8 }} bg="gray.800">
+      <Stack direction={["column", "column", "row"]}>
+        <Center>
+          <Heading as="h3" size="lg" color="gray.50" pb={4}>
+            Dados do Pagamento
+          </Heading>
+        </Center>
+        <Center pb={4}>
+          <Cards
+            cvc={state.cvc}
+            expiry={state.expiry}
+            focused={state.focus}
+            name={state.name}
+            number={state.number}
+            placeholders={{ name: "Seu nome aqui" }}
+          />
+        </Center>
+      </Stack>
 
-      <chakra.form onSubmit={formik.handleSubmit} noValidate>
-        <FormControl
-          id="number"
-          isRequired
-          pb={8}
-          color="gray.50"
-          isInvalid={formik.touched.number && Boolean(formik.errors.number)}
+      {data.status === "analise" ? (
+        <Result
+          status="warning"
+          title="Em Análise"
+          content="Por favor, aguarde a validação dos seus dados."
+        />
+      ) : data.status === "concluido" ? (
+        <Result
+          status="success"
+          title="Aprovado"
+          content="Pagamento concluido. Obrigado pela preferência."
+        />
+      ) : null}
+
+      {success ? (
+        <Result
+          status="success"
+          title="Sucesso"
+          content="Pagamento aprovado."
+        />
+      ) : (
+        <chakra.form
+          display={
+            data.status === "concluido" || data.status === "analise"
+              ? "none"
+              : undefined
+          }
+          onSubmit={formik.handleSubmit}
+          noValidate
         >
-          <FormLabel>NÚMERO DO CARTÃO</FormLabel>
-          <Input
-            as={InputMask}
-            name="number"
-            mask="9999 9999 9999 9999999"
-            maskChar=""
-            type="text"
-            value={formik.values.number}
-            onChange={handleInputChange}
-            onFocus={handleInputFocus}
-          />
-          <FormErrorMessage ms="4px">
-            {formik.touched.number && formik.errors.number}
-          </FormErrorMessage>
-        </FormControl>
-        <FormControl
-          id="name"
-          isRequired
-          pb={8}
-          color="gray.50"
-          isInvalid={formik.touched.name && Boolean(formik.errors.name)}
-        >
-          <FormLabel>NOME IMPRESSO NO CARTÃO</FormLabel>
-          <Input
-            type="text"
-            name="name"
-            value={formik.values.name.toUpperCase()}
-            onChange={handleInputChange}
-            onFocus={handleInputFocus}
-          />
-          <FormErrorMessage ms="4px">
-            {formik.touched.name && formik.errors.name}
-          </FormErrorMessage>
-        </FormControl>
-        <SimpleGrid columns={2} spacing={8}>
           <FormControl
-            id="expiry"
+            id="number"
             isRequired
-            pb={8}
+            pb={4}
             color="gray.50"
-            isInvalid={formik.touched.expiry && Boolean(formik.errors.expiry)}
+            isInvalid={formik.touched.number && Boolean(formik.errors.number)}
           >
-            <FormLabel>VALIDADE</FormLabel>
+            <FormLabel>NÚMERO DO CARTÃO</FormLabel>
             <Input
               as={InputMask}
-              mask="99/2099"
+              name="number"
+              mask="9999 9999 9999 9999999"
+              placeholder="**** **** **** ****"
               maskChar=""
               type="text"
-              name="expiry"
-              value={formik.values.expiry}
+              value={formik.values.number}
               onChange={handleInputChange}
               onFocus={handleInputFocus}
             />
             <FormErrorMessage ms="4px">
-              {formik.touched.expiry && formik.errors.expiry}
+              {formik.touched.number && formik.errors.number}
             </FormErrorMessage>
           </FormControl>
-
           <FormControl
-            id="cvc"
+            id="name"
             isRequired
-            pb={8}
+            pb={4}
             color="gray.50"
-            isInvalid={formik.touched.cvc && Boolean(formik.errors.cvc)}
+            isInvalid={formik.touched.name && Boolean(formik.errors.name)}
           >
-            <FormLabel>CVV / CVC</FormLabel>
+            <FormLabel>NOME IMPRESSO NO CARTÃO</FormLabel>
             <Input
               type="text"
-              name="cvc"
-              value={formik.values.cvc}
+              name="name"
+              placeholder="Titular do Cartão"
+              value={formik.values.name.toUpperCase()}
               onChange={handleInputChange}
               onFocus={handleInputFocus}
             />
             <FormErrorMessage ms="4px">
-              {formik.touched.cvc && formik.errors.cvc}
+              {formik.touched.name && formik.errors.name}
             </FormErrorMessage>
           </FormControl>
-        </SimpleGrid>
-        <FormControl
-          id="installments"
-          pb={8}
-          color="gray.50"
-          isRequired
-          isInvalid={
-            formik.touched.installments && Boolean(formik.errors.installments)
-          }
-        >
-          <FormLabel>NÚMERO DE PARCELAS</FormLabel>
-          <Select
-            value={formik.values.installments}
-            onChange={formik.handleChange}
+          <SimpleGrid columns={2} spacing={8}>
+            <FormControl
+              id="expiry"
+              isRequired
+              pb={4}
+              color="gray.50"
+              isInvalid={formik.touched.expiry && Boolean(formik.errors.expiry)}
+            >
+              <FormLabel>VALIDADE</FormLabel>
+              <Input
+                as={InputMask}
+                mask="99/2099"
+                placeholder="DD/YYYY"
+                maskChar=""
+                type="text"
+                name="expiry"
+                value={formik.values.expiry}
+                onChange={handleInputChange}
+                onFocus={handleInputFocus}
+              />
+              <FormErrorMessage ms="4px">
+                {formik.touched.expiry && formik.errors.expiry}
+              </FormErrorMessage>
+            </FormControl>
+
+            <FormControl
+              id="cvc"
+              isRequired
+              pb={4}
+              color="gray.50"
+              isInvalid={formik.touched.cvc && Boolean(formik.errors.cvc)}
+            >
+              <FormLabel>CVV / CVC</FormLabel>
+              <Input
+                type="text"
+                name="cvc"
+                placeholder="***"
+                value={formik.values.cvc}
+                onChange={handleInputChange}
+                onFocus={handleInputFocus}
+              />
+              <FormErrorMessage ms="4px">
+                {formik.touched.cvc && formik.errors.cvc}
+              </FormErrorMessage>
+            </FormControl>
+          </SimpleGrid>
+          <FormControl
+            id="installments"
+            pb={4}
+            color="gray.50"
+            isRequired
+            isInvalid={
+              formik.touched.installments && Boolean(formik.errors.installments)
+            }
           >
-            <option style={{ color: "black" }} value={0} disabled>
-              Selecione
-            </option>
-            {installments.map((installment, index) => (
-              <option
-                key={index}
-                value={installment}
-                style={{ color: "black" }}
-              >{`${installment}x`}</option>
-            ))}
-          </Select>
-          <FormErrorMessage ms="4px">
-            {formik.touched.installments && formik.errors.installments}
-          </FormErrorMessage>
-        </FormControl>
-        <Center pb={4}>
-          <Button type="submit" colorScheme="teal">
-            Finalizar Compra
-          </Button>
-        </Center>
-      </chakra.form>
+            <FormLabel>NÚMERO DE PARCELAS</FormLabel>
+            <Select
+              value={formik.values.installments}
+              onChange={formik.handleChange}
+            >
+              <option style={{ color: "black" }} value={0} disabled>
+                Selecione
+              </option>
+              {installments.map((installment, index) => (
+                <option
+                  key={index}
+                  value={installment}
+                  style={{ color: "black" }}
+                >{`${installment}x`}</option>
+              ))}
+            </Select>
+            <FormErrorMessage ms="4px">
+              {formik.touched.installments && formik.errors.installments}
+            </FormErrorMessage>
+          </FormControl>
+          <Center>
+            <Button type="submit" colorScheme="teal" isLoading={loading}>
+              Finalizar Compra
+            </Button>
+          </Center>
+        </chakra.form>
+      )}
     </Box>
   );
 };

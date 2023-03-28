@@ -1,9 +1,8 @@
-import { formatCurrency } from "@/helpers";
-import { FormatedClientData } from "@/models/checkout.models";
+import { formatCurrency, toUppercase } from "@/helpers";
+import { ClientData } from "@/models/checkout.models";
 import {
   Box,
   Divider,
-  Flex,
   Heading,
   HStack,
   Spacer,
@@ -14,12 +13,12 @@ import {
 } from "@chakra-ui/react";
 
 interface SummaryProps {
-  data: FormatedClientData;
+  data: ClientData;
 }
 
 export const Summary = ({ data }: SummaryProps) => {
   return (
-    <Box w="full" p={16}>
+    <Box w="full" p={{ base: 4, md: 8 }}>
       <Stack>
         <Heading as="h3" size="lg" color="gray.50">
           Resumo do Pedido
@@ -35,7 +34,7 @@ export const Summary = ({ data }: SummaryProps) => {
           </Text>
           <Spacer />
           <Text color="gray.50" fontSize="md">
-            {data.name}
+            {toUppercase(data.name)}
           </Text>
         </HStack>
         <HStack>
@@ -44,13 +43,15 @@ export const Summary = ({ data }: SummaryProps) => {
           </Text>
           <Spacer />
           <Text color="gray.50" fontSize="md">
-            {data.email}
+            {data.email
+              .toLowerCase()
+              .replace(/(\w{3})[\w.-]+@([\w.]+\w)/, "$1*****@$2")}
           </Text>
         </HStack>
       </Box>
       <Divider borderColor="gray.500" />
       <VStack pt={4} divider={<StackDivider borderColor="gray.500" />}>
-        {data.itens.map((item, index) => (
+        {data.antifraude.items.map((item, index) => (
           <Box key={index} w="full">
             <HStack direction="row" justifyContent="space-between">
               <Text as="b" color="gray.50" fontSize="md">
@@ -58,7 +59,7 @@ export const Summary = ({ data }: SummaryProps) => {
               </Text>
 
               <Text color="gray.50" fontSize="md" textAlign="end">
-                {item.name}
+                {toUppercase(item.name)}
               </Text>
             </HStack>
             <HStack direction="row" justifyContent="space-between">
@@ -76,7 +77,7 @@ export const Summary = ({ data }: SummaryProps) => {
               </Text>
 
               <Text color="gray.50" fontSize="md">
-                {item.valor_item}
+                {formatCurrency(item.valor_item)}
               </Text>
             </HStack>
             <HStack direction="row" justifyContent="space-between">
@@ -85,7 +86,7 @@ export const Summary = ({ data }: SummaryProps) => {
               </Text>
 
               <Text color="gray.50" fontSize="md">
-                {item.valor_total_item}
+                {formatCurrency(item.valor_total_item)}
               </Text>
             </HStack>
           </Box>

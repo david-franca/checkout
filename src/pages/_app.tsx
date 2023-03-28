@@ -8,6 +8,13 @@ const theme = extendTheme({
   fonts: {
     montserrat: inter.style.fontFamily,
   },
+  styles: {
+    global: {
+      "html, body": {
+        backgroundColor: "gray.800",
+      },
+    },
+  },
 });
 
 export default function App({ Component, pageProps }: AppProps) {
