@@ -1,4 +1,5 @@
 import { CreditCard } from "@/components/CreditCard";
+import { Head } from "@/components/Head";
 import { Header } from "@/components/Header";
 import { Summary } from "@/components/Summary";
 import { api } from "@/config/api";
@@ -19,6 +20,7 @@ const Checkout: NextPage<CheckoutProps> = ({ data, id }) => {
 
   return (
     <Box>
+      <Head title="Bike Point | Checkout" />
       <Header ref={headerRef} />
       <Stack
         direction={["column-reverse", "column-reverse", "row"]}

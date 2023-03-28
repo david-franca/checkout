@@ -1,8 +1,10 @@
+import { Head } from "@/components/Head";
 import { Box, Center, Heading, Text } from "@chakra-ui/react";
 
 export default function NotFound() {
   return (
     <Center bg="gray.800" minH="100vh">
+      <Head title="Bike Point" />
       <Box textAlign="center" py={10} px={6}>
         <Heading
           display="inline-block"
