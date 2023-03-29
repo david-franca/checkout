@@ -239,7 +239,7 @@ export const CreditCard = ({ data, id }: CreditCardProps) => {
               mask="9999 9999 9999 9999999"
               placeholder="**** **** **** ****"
               maskChar=""
-              type="text"
+              type="tel"
               value={formik.values.number}
               onChange={handleInputChange}
               onFocus={handleInputFocus}
@@ -282,7 +282,7 @@ export const CreditCard = ({ data, id }: CreditCardProps) => {
                 mask="99/2099"
                 placeholder="DD/YYYY"
                 maskChar=""
-                type="text"
+                type="tel"
                 name="expiry"
                 value={formik.values.expiry}
                 onChange={handleInputChange}
@@ -302,7 +302,7 @@ export const CreditCard = ({ data, id }: CreditCardProps) => {
             >
               <FormLabel>CVV / CVC</FormLabel>
               <Input
-                type="text"
+                type="tel"
                 name="cvc"
                 placeholder="***"
                 value={formik.values.cvc}
